@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cahier de texte – RVA – Culture et techniques avancées du numérique</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Source+Sans+3:wght@400;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#1b2430; --muted:#5b6675; --line:#e2e6ec; --bg:#f4f6f9; --card:#fff;
+  --brand:#1F4E79; --brand-soft:#e8f0f8; --ok:#1f7a4d; --ok-soft:#e5f4ec; --warn:#b26b00; --warn-soft:#fff3df;
+  --A:#2f6fb3; --B:#7a4fb5; --C:#0f8a8a; --D:#c2621a; --E:#c23a6b; --F:#4a7a1f; --G:#1f7a4d; --H:#b3352f; --X:#6b7480;
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Source Sans 3",system-ui,sans-serif;color:var(--ink);background:var(--bg);font-size:16px;line-height:1.45}
+.wrap{max-width:1050px;margin:0 auto;padding:20px 16px 60px}
+header.top{background:var(--brand);color:#fff;border-radius:12px;padding:18px 22px;display:grid;gap:6px}
+header.top .meta{display:flex;flex-wrap:wrap;gap:6px 22px;font-size:14px;opacity:.9}
+header.top h1{margin:0;font-size:24px;line-height:1.2}
+header.top .meta b{font-weight:700}
+
+.tabs{display:flex;gap:8px;margin:18px 0 10px;flex-wrap:wrap}
+.tab{border:1.5px solid var(--line);background:#fff;color:var(--ink);padding:9px 16px;border-radius:999px;font:600 15px inherit;font-family:inherit;cursor:pointer}
+.tab small{display:block;font-weight:400;font-size:12px;color:var(--muted)}
+.tab.active{background:var(--brand);border-color:var(--brand);color:#fff}
+.tab.active small{color:#cfe0f0}
+
+.panel{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+.summary{display:grid;grid-template-columns:1fr auto;gap:14px;align-items:center}
+.bar{height:12px;background:#e9edf2;border-radius:999px;overflow:hidden;margin-top:8px}
+.bar>i{display:block;height:100%;background:linear-gradient(90deg,var(--brand),#3a8fd6);border-radius:999px;transition:width .3s}
+.stats{font-size:14px;color:var(--muted)}
+.stats b{color:var(--ink);font-size:20px}
+.next{background:var(--warn-soft);border:1px solid #f1d39a;border-radius:10px;padding:10px 14px;margin-top:12px;font-size:15px}
+.next b{color:var(--warn)}
+
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;align-items:center;justify-content:space-between;margin:6px 0 12px}
+.filters{display:flex;gap:6px}
+.chip{border:1px solid var(--line);background:#fff;border-radius:8px;padding:6px 12px;font:inherit;font-size:14px;cursor:pointer;color:var(--ink)}
+.chip.on{background:var(--brand-soft);border-color:var(--brand);color:var(--brand);font-weight:600}
+.btn{border:1px solid var(--brand);background:var(--brand);color:#fff;border-radius:8px;padding:7px 13px;font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+.btn.ghost{background:#fff;color:var(--brand)}
+.btn:hover{filter:brightness(1.08)}
+
+.entry{display:grid;grid-template-columns:96px 1fr;gap:0;background:#fff;border:1px solid var(--line);border-radius:12px;margin-bottom:10px;overflow:hidden}
+.entry.done{background:#fbfdfc}
+.entry.isnext{border:2px solid var(--warn);box-shadow:0 2px 10px rgba(178,107,0,.12)}
+.left{padding:12px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;border-right:1px solid var(--line);background:#fafbfd}
+.hours{font:500 14px "JetBrains Mono",monospace;color:var(--brand);text-align:center}
+.badge{color:#fff;font-weight:700;font-size:13px;padding:3px 9px;border-radius:6px;text-align:center;min-width:34px}
+.dur{font-size:12px;color:var(--muted)}
+.right{padding:12px 14px;display:grid;gap:8px}
+.etitle{font-size:13px;color:var(--muted);font-weight:600;text-transform:uppercase;letter-spacing:.03em}
+.text{white-space:pre-line;outline:none;border-radius:6px;padding:4px 6px;margin:-4px -6px}
+.text:focus{background:var(--brand-soft)}
+.text.edited{border-left:3px solid var(--warn);padding-left:8px}
+.row{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:14px}
+.row label{display:flex;align-items:center;gap:6px;cursor:pointer}
+.row input[type=date]{font:inherit;font-size:14px;border:1px solid var(--line);border-radius:6px;padding:3px 6px}
+.row input[type=checkbox]{width:18px;height:18px;accent-color:var(--ok)}
+.status{font-size:13px;font-weight:600;padding:2px 9px;border-radius:999px}
+.status.ok{background:var(--ok-soft);color:var(--ok)}
+.status.todo{background:#eef1f5;color:var(--muted)}
+.spacer{flex:1}
+.mini{border:1px solid var(--line);background:#fff;border-radius:6px;padding:4px 10px;font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+.mini:hover{border-color:var(--brand);color:var(--brand)}
+.mini.copied{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+
+.legend{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:6px 14px;font-size:14px}
+.legend div{display:flex;gap:8px;align-items:flex-start}
+.legend .badge{flex:none;min-width:26px;padding:1px 6px}
+details summary{cursor:pointer;font-weight:700;color:var(--brand)}
+.sn{font-size:12px;font-weight:700;color:var(--muted);text-align:center}
+.badges{display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+.off{margin:-2px 0 10px;padding:8px 14px;border:1px dashed #e0a3a0;background:#fdf1f0;color:#a03a33;border-radius:10px;font-size:14px;font-weight:600}
+.foot{font-size:13px;color:var(--muted);text-align:center;margin-top:18px}
+.toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(80px);background:var(--ink);color:#fff;padding:10px 16px;border-radius:8px;font-size:14px;transition:transform .25s;z-index:9}
+.toast.show{transform:translateX(-50%) translateY(0)}
+
+@media (max-width:640px){
+  .entry{grid-template-columns:78px 1fr}
+  .summary{grid-template-columns:1fr}
+  header.top h1{font-size:20px}
+}
+@media print{
+  body{background:#fff}
+  .tabs,.toolbar,.mini,.next,details,.toast{display:none!important}
+  .entry{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <div class="meta"><span><b>OFPPT</b> – El Aioun Sidi Mellouk</span><span>Filière : <b>RVA</b></span><span>Année : <b>2026/2027</b></span><span>Formateur : <b>C. Amine</b></span></div>
+  <h1>Cahier de texte — Culture et techniques avancées du numérique</h1>
+  <div class="meta"><span>Masse horaire : <b>25 h</b> (23 h de formation + 1 h contrôle + 1 h EFM)</span><span>1re année : séances de 2 h (jeudi) · 2e année : séances de 4 h (mercredi)</span></div>
+</header>
+
+<nav class="tabs" id="tabs"></nav>
+
+<section class="panel">
+  <div class="summary">
+    <div>
+      <div class="stats"><b id="doneH">0</b> h réalisées sur 25 h — <span id="pct">0 %</span> · Groupe <span id="gname"></span> (<span id="year"></span>)</div>
+      <div class="stats" style="margin-top:2px">Créneau : <b style="font-size:15px" id="slot"></b></div>
+      <div class="bar"><i id="barfill" style="width:0"></i></div>
+    </div>
+    <div class="stats" id="remain"></div>
+  </div>
+  <div class="next" id="next"></div>
+</section>
+
+<div class="toolbar">
+  <div class="filters">
+    <button class="chip on" data-f="all">Toutes</button>
+    <button class="chip" data-f="todo">À faire</button>
+    <button class="chip" data-f="done">Réalisées</button>
+  </div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap">
+    <button class="btn ghost" id="copyAll">Copier tout le cahier</button>
+    <button class="btn ghost" id="resetG">Réinitialiser ce groupe</button>
+  </div>
+</div>
+
+<main id="list"></main>
+
+<section class="panel">
+  <details>
+    <summary>Éléments de la compétence (référentiel)</summary>
+    <div class="legend" id="legend" style="margin-top:10px"></div>
+  </details>
+</section>
+
+<p class="foot">Le texte de chaque séance est modifiable : cliquez dessus pour l'adapter. Les dates sont prévisionnelles (jours fériés déjà décalés) : corrigez-les si besoin. Cochez « Réalisée », puis « Copier » pour le coller dans eNote.<br>Les cases, dates et modifications sont gardées dans ce navigateur uniquement.</p>
+</div>
+<div class="toast" id="toast"></div>
+
+<script>
+const ELEMENTS = {
+  A:"Découvrir les concepts avancés de l'informatique (matériel, navigateur…)",
+  B:"Développer du contenu numérique : fonctionnalités avancées (Word et PowerPoint)",
+  C:"Rechercher l'information pour répondre à un besoin donné (moteur de recherche…)",
+  D:"Collaborer par le biais des technologies numériques (plateforme collaborative)",
+  E:"Partager un contenu numérique en ligne (réseaux sociaux…)",
+  F:"Découvrir les notions intermédiaires de la programmation (codage, algorithmique)",
+  G:"Gérer des données : fonctionnalités avancées (Excel)",
+  H:"Protéger les données personnelles et la vie privée (base de la sécurité)"
+};
+const ELNAMES={A:"Concepts avancés",B:"Word / PowerPoint",C:"Recherche d'information",D:"Collaboration",E:"Partage en ligne",F:"Programmation",G:"Excel",H:"Sécurité","—":"Organisation / évaluation"};
+
+/* ---------- 1re année : séances de 2 h, jeudi ---------- */
+const Y1 = [
+  {h:"H1–H2",d:2,date:"2026-11-05",el:["—"],done:true,t:"Séance du premier contact. Présentation du module. Premier atelier pour l'évaluation des prérequis."},
+  {h:"H3–H4",d:2,date:"2026-11-12",el:["A"],done:true,t:"Généralités sur les systèmes informatiques : notions d'information, d'informatique et de système informatique ; structure de base d'un ordinateur. Atelier : amélioration de la saisie au clavier (TypingClub)."},
+  {h:"H5–H6",d:2,date:"2026-11-19",el:["A","H"],t:"Le matériel informatique : unité centrale, processeur, mémoire, stockage, périphériques ; unités de mesure (Ko, Mo, Go) ; organisation des fichiers et dossiers, extensions de fichiers.\nSécurité de base : mot de passe sécurisé, reconnaître un message frauduleux, protection des données personnelles sur le téléphone et les réseaux sociaux."},
+  {h:"H7–H8",d:2,date:"2026-11-26",el:["A","C","B"],t:"Le navigateur web (onglets, favoris, téléchargements). Recherche d'information : choix des mots-clés, recherche d'images et de documents. Atelier : recherche du manuel d'un véhicule.\nWord : saisie et mise en forme des caractères et des paragraphes, alignement, listes à puces. Atelier : fiche client."},
+  {h:"H9–H10",d:2,date:"2026-12-03",el:["B"],t:"Word : insertion et mise en forme d'un tableau simple, insertion d'images. Atelier : fiche d'intervention garage.\nWord : mise en page, bordures, en-tête et pied de page, impression et export en PDF."},
+  {h:"H11–H12",d:2,date:"2026-12-10",el:["—","G"],t:"Contrôle continu n°1 (éléments A, B, C et H).\nExcel : présentation de l'interface (cellules, lignes, colonnes), saisie et mise en forme des données."},
+  {h:"H13–H14",d:2,date:"2026-12-17",el:["G"],t:"Excel : formules de calcul simples (+, -, *, /), fonctions SOMME et MOYENNE. Atelier : facture simple de pièces de rechange.\nExcel : calcul de la TVA et du total TTC, recopie des formules, mise en forme d'un tableau. Atelier : devis de réparation."},
+  {h:"H15–H16",d:2,date:"2026-12-24",el:["G"],t:"Excel : fonction SI, tri et filtre des données, mise en forme conditionnelle.\nExcel : création de graphiques. Atelier : gestion d'un stock de pièces de rechange."},
+  {h:"H17–H18",d:2,date:"2026-12-31",el:["B"],t:"PowerPoint : création de diapositives, choix d'un thème, insertion de texte et d'images.\nPowerPoint : transitions, animations simples, présentation orale. Atelier : présentation d'un organe du véhicule."},
+  {h:"H19–H20",d:2,date:"2027-01-07",el:["D","E"],t:"Messagerie électronique : création et utilisation d'une adresse Gmail, envoi d'un e-mail avec pièce jointe ; initiation à Google Drive.\nPartage de contenu en ligne : usage responsable des réseaux sociaux, partage de photos et de documents par WhatsApp, droit à l'image."},
+  {off:true,date:"2027-01-14",t:"Nouvel An amazigh (Yennayer) — jour férié"},
+  {h:"H21–H22",d:2,date:"2027-01-21",el:["F"],t:"Notion d'algorithme : suite ordonnée d'instructions. Atelier : algorithme d'une opération d'entretien (vidange).\nLes conditions (SI… ALORS… SINON), initiation à la programmation par blocs (Scratch)."},
+  {h:"H23–H24",d:2,date:"2027-01-28",el:["—"],t:"Révision générale : synthèse des éléments A à H.\nAtelier de préparation à l'EFM : exercices pratiques Word et Excel."},
+  {h:"H25",d:1,date:"2027-02-04",el:["—"],t:"Examen de fin de module (EFM)."}
+];
+
+/* ---------- 2e année : séances de 4 h, mercredi ---------- */
+function Y2(dates,doneFirst){return [
+  {h:"H1–H4",d:4,date:dates[0],el:["—"],done:doneFirst,t:"Séance du premier contact. Présentation du module. Premier atelier pour l'évaluation des prérequis."},
+  {h:"H5–H8",d:4,date:dates[1],el:["A"],done:doneFirst,t:"Généralités sur les systèmes informatiques : notions d'information, d'informatique et de système informatique ; structure de base d'un ordinateur. Atelier : amélioration de la saisie au clavier (TypingClub)."},
+  ...(dates[1]==="2026-11-11"?[{off:true,date:"2026-11-18",t:"Fête de l'Indépendance — jour férié"}]:[]),
+  {h:"H9–H12",d:4,date:dates[2],el:["A","H","C","D","E"],t:"Concepts avancés du matériel : processeur, RAM, SSD/HDD, ports et connectiques ; systèmes embarqués et calculateurs automobiles (ECU, prise OBD) ; navigateur : extensions, téléchargements, synchronisation.\nSécurité des données : mots de passe robustes, double authentification, hameçonnage, sauvegarde dans le cloud, protection des données des clients.\nRecherche avancée : opérateurs de recherche (guillemets, -, filetype:pdf, site:), fiabilité des sources. Atelier : recherche de références de pièces et de codes défaut OBD.\nCollaboration et partage en ligne : Google Drive, Docs et Sheets partagés, commentaires ; usage professionnel des réseaux sociaux (WhatsApp Business, page Facebook d'un garage), e-réputation."},
+  {h:"H13–H16",d:4,date:dates[3],el:["B","—"],t:"Word avancé : styles, titres hiérarchisés, table des matières automatique, sauts de page et de section ; tableaux avancés, images et formes, modèles de documents. Atelier : rapport technique d'intervention.\nWord : publipostage (lettres de rappel d'entretien aux clients). Atelier : CV et lettre de motivation.\nContrôle continu n°1 (éléments A, B, C, D, E et H)."},
+  {h:"H17–H20",d:4,date:dates[4],el:["G"],t:"Excel : fonctions (SOMME, MOYENNE, MIN, MAX, NB), références relatives et absolues, fonctions SI et RECHERCHEV. Atelier : devis automatique de réparation (pièces, main-d'œuvre, TVA).\nExcel : tri, filtres, mise en forme conditionnelle, graphiques. Atelier : gestion du stock de pièces et suivi de l'entretien d'un parc de véhicules."},
+  {h:"H21–H24",d:4,date:dates[5],el:["B","F","—"],t:"PowerPoint avancé : masque des diapositives, SmartArt, animations, présentation professionnelle.\nAlgorithmique : variables, conditions, boucles, organigrammes. Atelier : algorithme de diagnostic d'une panne à partir des symptômes.\nRévision générale et préparation à l'EFM."},
+  {h:"H25",d:1,date:dates[6],el:["—"],t:"Examen de fin de module (EFM)."}
+]}
+
+const GROUPS = {
+  rva101:{name:"RVA101",year:"1re année",slot:"Jeudi 10h–12h",plan:Y1.map(e=>({...e}))},
+  rva102:{name:"RVA102",year:"1re année",slot:"Jeudi 8h–10h",plan:Y1.map(e=>({...e}))},
+  rva201:{name:"RVA201",year:"2e année",slot:"Mercredi 14h–18h",plan:Y2(["2026-11-04","2026-11-11","2026-11-25","2026-12-02","2026-12-09","2026-12-16","2026-12-23"],true)},
+  rva202:{name:"RVA202",year:"2e année",slot:"Mercredi 14h–18h — en stage, prendra le créneau de RVA201",plan:Y2(["","","","","","",""],false)}
+};
+
+/* ---------- storage (per viewer, optional) ---------- */
+const KEY="cahier-rva-2026-v3";
+let store={};
+try{store=JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){store={}}
+function save(){try{localStorage.setItem(KEY,JSON.stringify(store))}catch(e){}}
+function st(g,i){store[g]=store[g]||{};store[g][i]=store[g][i]||{};return store[g][i]}
+
+let current=(location.hash||"").replace("#","");
+if(!GROUPS[current])current="rva101";
+let filter="all";
+
+const $=s=>document.querySelector(s);
+const colorOf=el=>`var(--${/^[A-H]/.test(el)?el[0]:"X"})`;
+const fmt=d=>d?new Date(d+"T12:00").toLocaleDateString("fr-FR",{weekday:"long",day:"2-digit",month:"2-digit",year:"numeric"}):"date à fixer";
+
+function isDone(g,i){const e=GROUPS[g].plan[i];if(e.off)return false;const s=store[g]?.[i];if(s&&typeof s.done==="boolean")return s.done;return !!e.done}
+function textOf(g,i){const s=store[g]?.[i];return (s&&s.text!=null)?s.text:GROUPS[g].plan[i].t}
+function dateOf(g,i){const s=store[g]?.[i];return (s&&s.date!=null)?s.date:(GROUPS[g].plan[i].date||"")}
+function doneHours(g){return GROUPS[g].plan.reduce((a,e,i)=>a+(isDone(g,i)?e.d:0),0)}
+
+function renderTabs(){
+  $("#tabs").innerHTML=Object.entries(GROUPS).map(([k,g])=>
+    `<button class="tab ${k===current?"active":""}" data-g="${k}">${g.name}<small>${g.year} · ${doneHours(k)}/25 h</small></button>`).join("");
+  document.querySelectorAll(".tab").forEach(b=>b.onclick=()=>{location.hash=b.dataset.g});
+}
+
+function render(){
+  const G=GROUPS[current];
+  renderTabs();
+  $("#gname").textContent=G.name;$("#year").textContent=G.year;$("#slot").textContent=G.slot;
+  const dh=doneHours(current);
+  $("#doneH").textContent=dh;
+  const p=Math.round(dh/25*100);
+  $("#pct").textContent=p+" %";$("#barfill").style.width=p+"%";
+  $("#remain").innerHTML=`Reste : <b>${25-dh} h</b>`;
+  const nextI=G.plan.findIndex((e,i)=>!e.off&&!isDone(current,i));
+  $("#next").innerHTML=nextI<0?"<b>Module terminé.</b> Toutes les séances sont réalisées."
+    :`<b>Prochaine séance — ${fmt(dateOf(current,nextI))} (${G.plan[nextI].h}) :</b><br>${esc(textOf(current,nextI)).replace(/\n/g,"<br>")}`;
+
+  let n=0;
+  $("#list").innerHTML=G.plan.map((e,i)=>{
+    if(e.off){ if(filter!=="all")return""; return `<div class="off">${fmt(e.date)} — ${esc(e.t)}</div>`;}
+    n++;
+    const d=isDone(current,i);
+    if(filter==="todo"&&d)return"";if(filter==="done"&&!d)return"";
+    const s=store[current]?.[i]||{};
+    const edited=s.text!=null&&s.text!==e.t;
+    const badges=e.el.map(x=>`<div class="badge" style="background:${colorOf(x)}" title="${esc(ELEMENTS[x]||ELNAMES[x])}">${x}</div>`).join("");
+    const title=e.el.map(x=>ELNAMES[x]).join(" · ");
+    return `<article class="entry ${d?"done":""} ${i===nextI?"isnext":""}" data-i="${i}">
+      <div class="left"><div class="sn">Séance ${n}</div><div class="hours">${e.h}</div><div class="badges">${badges}</div><div class="dur">${e.d} h</div></div>
+      <div class="right">
+        <div class="etitle">${esc(title)}</div>
+        <div class="text ${edited?"edited":""}" contenteditable="true" spellcheck="true">${esc(textOf(current,i))}</div>
+        <div class="row">
+          <label><input type="checkbox" class="cb" ${d?"checked":""}> Réalisée</label>
+          <label>Date : <input type="date" class="dt" value="${dateOf(current,i)}"></label>
+          <span class="status ${d?"ok":"todo"}">${d?"Réalisée":"À faire"}</span>
+          <span class="spacer"></span>
+          ${edited?`<button class="mini rst">Texte d'origine</button>`:""}
+          <button class="mini cp">Copier</button>
+        </div>
+      </div></article>`}).join("")||`<div class="panel">Aucune séance dans ce filtre.</div>`;
+
+  document.querySelectorAll(".entry").forEach(el=>{
+    const i=+el.dataset.i;
+    el.querySelector(".cb").onchange=ev=>{st(current,i).done=ev.target.checked;save();render()};
+    el.querySelector(".dt").onchange=ev=>{st(current,i).date=ev.target.value;save();render()};
+    const tx=el.querySelector(".text");
+    tx.onblur=()=>{const v=tx.innerText.trim();const orig=GROUPS[current].plan[i].t;
+      if(v===textOf(current,i))return;
+      st(current,i).text=(v===orig||v==="")?null:v;save();render()};
+    const r=el.querySelector(".rst");if(r)r.onclick=()=>{st(current,i).text=null;save();render()};
+    el.querySelector(".cp").onclick=ev=>copy(textOf(current,i),ev.target);
+  });
+}
+
+function esc(s){return String(s).replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+
+function toast(m){const t=$("#toast");t.textContent=m;t.classList.add("show");clearTimeout(t._h);t._h=setTimeout(()=>t.classList.remove("show"),1800)}
+async function copy(txt,btn){
+  let ok=false;
+  try{await navigator.clipboard.writeText(txt);ok=true}catch(e){
+    try{const ta=document.createElement("textarea");ta.value=txt;document.body.appendChild(ta);ta.select();ok=document.execCommand("copy");ta.remove()}catch(e2){}
+  }
+  if(btn&&ok){const o=btn.textContent;btn.textContent="Copié ✓";btn.classList.add("copied");setTimeout(()=>{btn.textContent=o;btn.classList.remove("copied")},1500)}
+  toast(ok?"Texte copié — collez-le dans eNote":"Copie impossible : sélectionnez le texte manuellement");
+}
+
+document.querySelectorAll(".chip").forEach(c=>c.onclick=()=>{
+  document.querySelectorAll(".chip").forEach(x=>x.classList.remove("on"));c.classList.add("on");filter=c.dataset.f;render()});
+
+$("#copyAll").onclick=ev=>{
+  const G=GROUPS[current];let n=0;
+  const lines=G.plan.map((e,i)=>{if(e.off)return null;n++;
+    const dt=dateOf(current,i);const date=dt?new Date(dt+"T12:00").toLocaleDateString("fr-FR"):"__/__/____";
+    return `Séance ${n} | ${e.h} | ${date} | ${isDone(current,i)?"Réalisée":"À faire"}\n${textOf(current,i)}`}).filter(Boolean);
+  copy(`Cahier de texte – ${G.name} (${G.year}) – Culture et techniques avancées du numérique\n\n`+lines.join("\n\n"),ev.target);
+};
+
+let resetArmed=false;
+$("#resetG").onclick=ev=>{
+  if(!resetArmed){resetArmed=true;ev.target.textContent="Confirmer la réinitialisation ?";
+    setTimeout(()=>{resetArmed=false;ev.target.textContent="Réinitialiser ce groupe"},3000);return}
+  delete store[current];save();resetArmed=false;ev.target.textContent="Réinitialiser ce groupe";render();toast("Groupe réinitialisé")};
+
+$("#legend").innerHTML=Object.entries(ELEMENTS).map(([k,v])=>`<div><span class="badge" style="background:${colorOf(k)}">${k}</span><span>${v}</span></div>`).join("");
+
+window.addEventListener("hashchange",()=>{const h=location.hash.replace("#","");if(GROUPS[h]){current=h;render()}});
+render();
+</script>
+</body>
+</html>
